@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="author" content="Sam Peters">
+    <meta name="description" content="Spotify Sorter is a third party website that helps
+     spotify users manage large libraries.">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{css}}"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <title>Spotify Sorter</title>
+  </head>
+  <body>
+  <div id="wrapper">
+    <div id="sidebar-wrapper">
+      
+        <form method="POST" action="" style="padding:10px" id="clusterform">
+            <h4 id="formheader">Choose song attributes to cluster your library</h4>
+            <label class="unselectable form-check-label" for="f1">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="acousticness" id="f1" type="checkbox">
+                    <h5 style="display: inline-block">Acousticness</h5>
+                </div>
+            </label>
+
+            <label class="unselectable form-check-label" for="f2">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="danceability" id="f2" type="checkbox">
+                    <h5 style="display: inline-block">Danceability</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f3">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="energy" id="f3" type="checkbox">
+                    <h5 style="display: inline-block">Energy</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f4">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="instrumentalness" id="f4" type="checkbox">
+                    <h5 style="display: inline-block">Instrumentalness</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f5">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="key" id="f5" type="checkbox">
+                    <h5 style="display: inline-block">Key</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f6">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="liveness" id="f6" type="checkbox">
+                    <h5 style="display: inline-block">Loudness</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f7">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="loudness" id="f7" type="checkbox">
+                    <h5 style="display: inline-block">Loudness</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f8">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="mode" id="f8" type="checkbox">
+                    <h5 style="display: inline-block">Mode</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f9">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="speechiness" id="f9" type="checkbox">
+                    <h5 style="display: inline-block">Speechiness</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f10">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="valence" id="f10" type="checkbox">
+                    <h5 style="display: inline-block">Valence</h5>
+                </div>
+            </label>
+            <label class="unselectable form-check-label" for="f11">
+                <div style="width: 250px; height: 30px;">
+                    <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="tempo" id="f11" type="checkbox">
+                    <h5 style="display: inline-block">Tempo</h5>
+                </div>
+            </label>
+            <button type="submit" id="clustersubmit" class="btn btn-primary mb-2">Submit</button>
+        </form>
+
+        <form method="POST" action="" id="refresh">
+          <p><input type="submit" class="btn btn-primary" id="refreshb" name="refresh" style="position:absolute; bottom:0; width:100%;" value="Refresh Library"></p>
+        </form>
+    </div>
+    <div id="main-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            <a href="#"  style="font-size: 2rem; text-decoration: none; color: black;" id="menu-toggle">&#8801;</a>
+            <h1>Spotify Sorter &#9835;</h1>
+            <h3>Automatically create new playlists by clustering the 
+              songs in your library by attributes like danceability, acousticness, and instrumentalness.</h3>
+            {% if clusters is defined %}
+            <nav>
+
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                  {% set first = 'true' %}
+                  {% for cluster in clusters %}
+                    {% if loop.first %}
+                      <a class="nav-item nav-link active" id="nav-{{loop.index}}-tab" data-toggle="tab" href="#nav-{{loop.index}}" role="tab" aria-controls="nav-{{loop.index}}" aria-selected="true">Cluster {{loop.index}}</a>
+                    {% else %}
+                      <a class="nav-item nav-link" id="nav-{{loop.index}}-tab" data-toggle="tab" href="#nav-{{loop.index}}" role="tab" aria-controls="nav-{{loop.index}}" aria-selected="false">Cluster {{loop.index}}</a>
+                    {% endif %}
+                    {% set first = 'false' %}
+                  {% endfor %}
+                </div>
+              </nav>
+              <div class="tab-content" id="nav-tabContent">
+                  {% set first = 'true' %}
+                  {% for cluster in clusters %}
+                    {% if loop.first %}
+                      <div class="tab-pane fade show active" id="nav-{{loop.index}}" role="tabpanel" aria-labelledby="nav-{{loop.index}}-tab">
+                        <div style="display:flex;height:40px;overflow:hidden;">
+                          <span style="padding-left: 10px;text-align: center; font-weight:600; font-size:2em"> <h4>Cluster {{loop.index}}</h4></span>
+                          <a class="btn btn-primary add-playlist" data-cluster="{{clustersById[loop.index0]}}" style="color:white; position: absolute; right:14px">Save playlist to Spotify</a>
+                        </div>
+                          <div class="list-group d-flex flex-row flex-wrap">
+                              {% for track in cluster %}
+                                <a class="list-group-item w-50">{{track.name}} by {{track.artist}}</a>
+                              {% endfor %}
+                              </div>
+                      </div>
+                    {% else %}
+                      <div class="tab-pane fade" id="nav-{{loop.index}}" role="tabpanel" aria-labelledby="nav-{{loop.index}}-tab">
+                          <div style="display:flex;height:40px;overflow:hidden;">
+                              <span style="padding-left: 10px;text-align: center; font-weight:600; font-size:2em"> <h4>Cluster {{loop.index}}</h4></span>
+                              <a class="btn btn-primary add-playlist" data-cluster="{{clustersById[loop.index0]}}" style="color:white; position: absolute; right:14px">Save playlist to Spotify</a>
+                            </div>
+                          <div class="list-group d-flex flex-row flex-wrap">
+                                  {% for track in cluster %}
+                                    <a class="list-group-item w-50">{{track.name}} by {{track.artist}}</a>
+                                  {% endfor %}    
+                                  </div>
+                      </div>
+                    {% endif %}
+                    {% set first = 'false' %}
+                  {% endfor %}
+              </div>
+              
+              {% else %}
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu venenatis lorem. Pellentesque consectetur tincidunt nunc non ultrices. Nulla sed dui in ipsum venenatis mollis. Nunc non eros vel massa viverra laoreet sed nec leo. Duis molestie sollicitudin mi vitae placerat. Integer sed enim neque. Nam tincidunt porta pellentesque. Pellentesque justo augue, congue ut aliquet sed, convallis quis augue. Fusce vitae sem ut quam lacinia facilisis sed eget tortor. Nullam sed consectetur enim, quis tempor arcu. Curabitur dapibus faucibus sapien sed rutrum. Curabitur faucibus eu sem sed faucibus. Cras eget arcu erat. Morbi eu arcu orci. Curabitur lacinia dui sem, in suscipit nulla tristique id. Proin mattis auctor vehicula.</p>
+
+                  <p>Donec vel mauris at diam pharetra rutrum in a mi. Praesent facilisis consequat odio, et pellentesque nulla iaculis nec. Nam non porta lacus. Phasellus luctus malesuada pulvinar. In condimentum mauris aliquet, feugiat turpis sit amet, lacinia lacus. Donec at congue diam. Maecenas elementum odio vehicula libero rhoncus euismod. Vivamus tristique ipsum sed leo scelerisque elementum. Sed in commodo leo, in venenatis tortor. Nullam euismod efficitur leo nec malesuada. Curabitur convallis sollicitudin enim, quis congue diam cursus eget. Morbi id nibh enim.</p>
+                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu venenatis lorem. Pellentesque consectetur tincidunt nunc non ultrices. Nulla sed dui in ipsum venenatis mollis. Nunc non eros vel massa viverra laoreet sed nec leo. Duis molestie sollicitudin mi vitae placerat. Integer sed enim neque. Nam tincidunt porta pellentesque. Pellentesque justo augue, congue ut aliquet sed, convallis quis augue. Fusce vitae sem ut quam lacinia facilisis sed eget tortor. Nullam sed consectetur enim, quis tempor arcu. Curabitur dapibus faucibus sapien sed rutrum. Curabitur faucibus eu sem sed faucibus. Cras eget arcu erat. Morbi eu arcu orci. Curabitur lacinia dui sem, in suscipit nulla tristique id. Proin mattis auctor vehicula.</p>
+
+                  <p>Donec vel mauris at diam pharetra rutrum in a mi. Praesent facilisis consequat odio, et pellentesque nulla iaculis nec. Nam non porta lacus. Phasellus luctus malesuada pulvinar. In condimentum mauris aliquet, feugiat turpis sit amet, lacinia lacus. Donec at congue diam. Maecenas elementum odio vehicula libero rhoncus euismod. Vivamus tristique ipsum sed leo scelerisque elementum. Sed in commodo leo, in venenatis tortor. Nullam euismod efficitur leo nec malesuada. Curabitur convallis sollicitudin enim, quis congue diam cursus eget. Morbi id nibh enim.</p> <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu venenatis lorem. Pellentesque consectetur tincidunt nunc non ultrices. Nulla sed dui in ipsum venenatis mollis. Nunc non eros vel massa viverra laoreet sed nec leo. Duis molestie sollicitudin mi vitae placerat. Integer sed enim neque. Nam tincidunt porta pellentesque. Pellentesque justo augue, congue ut aliquet sed, convallis quis augue. Fusce vitae sem ut quam lacinia facilisis sed eget tortor. Nullam sed consectetur enim, quis tempor arcu. Curabitur dapibus faucibus sapien sed rutrum. Curabitur faucibus eu sem sed faucibus. Cras eget arcu erat. Morbi eu arcu orci. Curabitur lacinia dui sem, in suscipit nulla tristique id. Proin mattis auctor vehicula.</p>
+
+                  <p>Donec vel mauris at diam pharetra rutrum in a mi. Praesent facilisis consequat odio, et pellentesque nulla iaculis nec. Nam non porta lacus. Phasellus luctus malesuada pulvinar. In condimentum mauris aliquet, feugiat turpis sit amet, lacinia lacus. Donec at congue diam. Maecenas elementum odio vehicula libero rhoncus euismod. Vivamus tristique ipsum sed leo scelerisque elementum. Sed in commodo leo, in venenatis tortor. Nullam euismod efficitur leo nec malesuada. Curabitur convallis sollicitudin enim, quis congue diam cursus eget. Morbi id nibh enim.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $("#menu-toggle").click(function(e){
+      e.preventDefault();
+      $("#wrapper").toggleClass("menuDisplayed");
+
+
+    });
+  </script>
+  <script>
+    $(".add-playlist").on('click', function (event) {  
+      event.preventDefault();
+      var el = $(this);
+      el.prop('disabled', true);
+      setTimeout(function(){el.prop('disabled', false); }, 3000);
+      var data = JSON.stringify($(this).attr('data-cluster'));
+      $.ajax({
+        url: 'saveplaylist',
+        type: 'POST',
+        data: data,
+        contentType: 'application/json',
+        processData: false,
+      });
+    });
+  </script>
+  </body>
+</html>
