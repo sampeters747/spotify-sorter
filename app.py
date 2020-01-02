@@ -91,7 +91,7 @@ User_tracks = db.Table('User_tracks',
 )
 
 # Initial DB Setup, careful, DROPS TABLES
-setup = True
+setup = False
 if setup:
     db.drop_all()
     db.create_all()
