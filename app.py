@@ -7,7 +7,7 @@ import time
 from math import ceil, sqrt
 import random
 import numpy as np
-from flask_session import Session
+
 
 app = Flask(__name__)
 
@@ -15,13 +15,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key= 'reallysecret'
 app.config['SQLALCHEMY_ECHO'] = False
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://sam:verysecret@localhost:5432/flask"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://dhwifidrftzuwl:a76907ed2dfe16617a065ecd5df63b85a9c139118397af1b46026d197929d2b7@ec2-23-23-92-204.compute-1.amazonaws.com:5432/d4mek8pscfb750"
 db = SQLAlchemy(app)
-
+'''
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
-
+'''
 # SQLAlchemy Models
 class User(db.Model):
     __tablename__ = 'User'
