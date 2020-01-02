@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="author" content="Sam Peters">
+    <link rel="shortcut icon" href="{{ favicon }}" type="image/x-icon">
     <meta name="description" content="Spotify Sorter is a third party website that helps
      spotify users manage large libraries.">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -51,7 +52,7 @@
             <label class="unselectable form-check-label" for="f6">
                 <div style="width: 250px; height: 30px;">
                     <input class="clustercheck" name="f" style="margin-inline-start: 10px; position: relative; top: -3px;" value="liveness" id="f6" type="checkbox">
-                    <h5 style="display: inline-block">Loudness</h5>
+                    <h5 style="display: inline-block">Liveness</h5>
                 </div>
             </label>
             <label class="unselectable form-check-label" for="f7">
@@ -84,7 +85,7 @@
                     <h5 style="display: inline-block">Tempo</h5>
                 </div>
             </label>
-            <button type="submit" id="clustersubmit" class="btn btn-primary mb-2">Submit</button>
+            <button type="submit" id="clustersubmit" class="btn btn-primary mb-2">Create Playlists</button>
         </form>
 
         <form method="POST" action="" id="refresh">
@@ -147,14 +148,29 @@
               </div>
               
               {% else %}
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu venenatis lorem. Pellentesque consectetur tincidunt nunc non ultrices. Nulla sed dui in ipsum venenatis mollis. Nunc non eros vel massa viverra laoreet sed nec leo. Duis molestie sollicitudin mi vitae placerat. Integer sed enim neque. Nam tincidunt porta pellentesque. Pellentesque justo augue, congue ut aliquet sed, convallis quis augue. Fusce vitae sem ut quam lacinia facilisis sed eget tortor. Nullam sed consectetur enim, quis tempor arcu. Curabitur dapibus faucibus sapien sed rutrum. Curabitur faucibus eu sem sed faucibus. Cras eget arcu erat. Morbi eu arcu orci. Curabitur lacinia dui sem, in suscipit nulla tristique id. Proin mattis auctor vehicula.</p>
+              <p><b>To start</b> check the boxes of the attributes you want to use to sort your messy spotify library into new playlists. For the best results, select all of them. <b>Next</b>, browse all of the playlists created from your library, and click the <b>Save playlist to Spotify</b> button for any that look good to save them to your spotify account.</p>
 
-                  <p>Donec vel mauris at diam pharetra rutrum in a mi. Praesent facilisis consequat odio, et pellentesque nulla iaculis nec. Nam non porta lacus. Phasellus luctus malesuada pulvinar. In condimentum mauris aliquet, feugiat turpis sit amet, lacinia lacus. Donec at congue diam. Maecenas elementum odio vehicula libero rhoncus euismod. Vivamus tristique ipsum sed leo scelerisque elementum. Sed in commodo leo, in venenatis tortor. Nullam euismod efficitur leo nec malesuada. Curabitur convallis sollicitudin enim, quis congue diam cursus eget. Morbi id nibh enim.</p>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu venenatis lorem. Pellentesque consectetur tincidunt nunc non ultrices. Nulla sed dui in ipsum venenatis mollis. Nunc non eros vel massa viverra laoreet sed nec leo. Duis molestie sollicitudin mi vitae placerat. Integer sed enim neque. Nam tincidunt porta pellentesque. Pellentesque justo augue, congue ut aliquet sed, convallis quis augue. Fusce vitae sem ut quam lacinia facilisis sed eget tortor. Nullam sed consectetur enim, quis tempor arcu. Curabitur dapibus faucibus sapien sed rutrum. Curabitur faucibus eu sem sed faucibus. Cras eget arcu erat. Morbi eu arcu orci. Curabitur lacinia dui sem, in suscipit nulla tristique id. Proin mattis auctor vehicula.</p>
+                  <p>This site will not modify your saved songs, or any of your existing playlists. It will only create new playlists when you click the save playlist button.</p>
+                  <h4>Track Attributes</h4>
+                  <h6>Spotify describes each song using a number of different ways, and we use these attributes to group similar songs together in playlists. Learn about what each one means below.</h6>
+                  <ul>
+                    <li><b>Acousticness</b> - How likely a song is to be acoustic.</li>
+                    <li><b>Danceability</b> - How danceable a song is. Based on things like tempo and how regular a song is.</li>
+                    <li><b>Energy</b> - Measure of how much intensity and activity is in a song.</li>
+                    <li><b>Instrumentalness</b> - How likely a track is to be instrumental.</li>
+                    <li><b>Key</b> - Estimated overall key of a track, represented as an integer.</li>
+                    <li><b>Liveness</b> - How likely a song was performed live.</li>
+                    <li><b>Loudness</b> - Average loudness of a track in decibels.</li>
+                    <li><b>Mode</b> - The modality of a track, either being major or minor.</li>
+                    <li><b>Speechiness</b> - The amount of spoken words in a track.</li>
+                    <li><b>Valence</b> - How positive a track sounds. A valence value means a track sounds happy, while a low one means it sounds sadder.</li>
+                    <li><b>Tempo</b> - The average beats per minute in a track.</li>
+                  </ul>
+                  <h4>How Everything Works</h4>
 
-                  <p>Donec vel mauris at diam pharetra rutrum in a mi. Praesent facilisis consequat odio, et pellentesque nulla iaculis nec. Nam non porta lacus. Phasellus luctus malesuada pulvinar. In condimentum mauris aliquet, feugiat turpis sit amet, lacinia lacus. Donec at congue diam. Maecenas elementum odio vehicula libero rhoncus euismod. Vivamus tristique ipsum sed leo scelerisque elementum. Sed in commodo leo, in venenatis tortor. Nullam euismod efficitur leo nec malesuada. Curabitur convallis sollicitudin enim, quis congue diam cursus eget. Morbi id nibh enim.</p> <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu venenatis lorem. Pellentesque consectetur tincidunt nunc non ultrices. Nulla sed dui in ipsum venenatis mollis. Nunc non eros vel massa viverra laoreet sed nec leo. Duis molestie sollicitudin mi vitae placerat. Integer sed enim neque. Nam tincidunt porta pellentesque. Pellentesque justo augue, congue ut aliquet sed, convallis quis augue. Fusce vitae sem ut quam lacinia facilisis sed eget tortor. Nullam sed consectetur enim, quis tempor arcu. Curabitur dapibus faucibus sapien sed rutrum. Curabitur faucibus eu sem sed faucibus. Cras eget arcu erat. Morbi eu arcu orci. Curabitur lacinia dui sem, in suscipit nulla tristique id. Proin mattis auctor vehicula.</p>
+                  <p>When you log in, this site uses <a href="https://developer.spotify.com/documentation/general/guides/authorization-guide/">Spotify's API</a> to get all of the tracks you've saved on Spotify and stores this information in an SQL database waiting for you to choose which attributes you want to use to sort your library by to make new playlists. To create great playlists, we group songs that are close together musically in the same playlist. Every track has a set of numbers, each describing a different attribute it has (ex. a classical piano track might have acousticness value of 0.9, and a speechiness value of 0), and we can treat this set of numbers like coordinates and 'plot' each track on a graph based off it's attributes. From there we use an algorithm called
+                     <a href="https://en.wikipedia.org/wiki/K-means_clustering">k-means clustering</a> to sort each of your songs into groups of songs that are close together.
 
-                  <p>Donec vel mauris at diam pharetra rutrum in a mi. Praesent facilisis consequat odio, et pellentesque nulla iaculis nec. Nam non porta lacus. Phasellus luctus malesuada pulvinar. In condimentum mauris aliquet, feugiat turpis sit amet, lacinia lacus. Donec at congue diam. Maecenas elementum odio vehicula libero rhoncus euismod. Vivamus tristique ipsum sed leo scelerisque elementum. Sed in commodo leo, in venenatis tortor. Nullam euismod efficitur leo nec malesuada. Curabitur convallis sollicitudin enim, quis congue diam cursus eget. Morbi id nibh enim.</p>
             {% endif %}
           </div>
         </div>

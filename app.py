@@ -91,7 +91,7 @@ User_tracks = db.Table('User_tracks',
 )
 
 # Initial DB Setup, careful, DROPS TABLES
-setup = False
+setup = True
 if setup:
     db.drop_all()
     db.create_all()
@@ -604,13 +604,14 @@ def saveplaylist():
     return False
 @app.route('/',  methods=['GET','POST'])
 def index():
+    favicon = url_for('static', filename='favicon.ico')
     if 'id' in session:
         name= session['id']
         user = db.session.query(User).get(session['id'])
         if not user:
             redir = sp_oauth.get_authorize_url()
             css = url_for('static', filename='unverified.css')
-            return render_template('unverified.html', css = css, redirect_url = redir)
+            return render_template('unverified.html', css = css, redirect_url = redir, favicon=favicon)
         name = f'{name}: {len(user.tracks)}'
         print(f'printing user:{user}')
         css = url_for('static', filename='index.css')
@@ -653,15 +654,15 @@ def index():
                     json_string = json.dumps(id_l)
                     clustersById.append(json_string)
                     
-                return render_template('index.html', css = css, name= name, clusters= clusters, clustersById=clustersById)
+                return render_template('index.html', css = css, name= name, clusters= clusters, clustersById=clustersById, favicon=favicon)
         else:
             print('no form')
-        return render_template('index.html', css = css, name= name)
+        return render_template('index.html', css = css, name= name, favicon=favicon)
 
     else:
         redir = sp_oauth.get_authorize_url()
         css = url_for('static', filename='unverified.css')
-        return render_template('unverified.html', css = css, redirect_url = redir)
+        return render_template('unverified.html', css = css, redirect_url = redir, favicon=favicon)
 
 @app.route('/login')
 def give_auth_url():
