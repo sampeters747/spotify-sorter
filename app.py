@@ -99,7 +99,7 @@ if setup:
 # Spotify Oauth2 Api Access Stuff
 client_id = '8e444e79ae284509aed0c135b2bf555a'
 client_secret = 'ee58df103e0043df970fc00d50a81ccb'
-redirect_uri = 'https://spotify-sorter.herokuapp.com/callback'
+redirect_uri = 'http://sorter.sampeters.me//callback'
 scope='user-library-read user-read-private playlist-modify-public'
 sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, scope= scope)
 
