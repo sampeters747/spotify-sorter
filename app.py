@@ -676,14 +676,17 @@ def retrive_code():
     sp_auth_response = sp_oauth.get_access_token(code)
     sp = spotipy.client.Spotify(auth= sp_auth_response['access_token'])
     me = sp.me()
+    user = db.session.query(User).get(me['id'])
     session['id'] = me['id']
     session['updated'] = None
-    user = User(user_id=  me['id'], access_token= sp_auth_response['access_token'], access_expires= sp_auth_response['expires_at'], refresh_token= sp_auth_response['refresh_token'])
-    try:
-        db.session.add(user)
-        db.session.commit()
-    except:
-        print(f"User: {user.user_id} already in db")
+    if not user:
+        try:
+            user = User(user_id=  me['id'], access_token= sp_auth_response['access_token'], access_expires= sp_auth_response['expires_at'], refresh_token= sp_auth_response['refresh_token'])
+            db.session.add(user)
+            db.session.commit()
+        except:
+            print(f"User: {user.user_id} already in db")
+            db.session.rollback()
     refresh_user_tracks(user)
     return redirect(url_for('index'))
 
