@@ -7,21 +7,16 @@ import time
 from math import ceil, sqrt
 import random
 import numpy as np
-
+import os
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key= 'reallysecret'
+app.secret_key= os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_ECHO'] = False
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://dhwifidrftzuwl:a76907ed2dfe16617a065ecd5df63b85a9c139118397af1b46026d197929d2b7@ec2-23-23-92-204.compute-1.amazonaws.com:5432/d4mek8pscfb750"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
-'''
-SESSION_TYPE = 'filesystem'
-app.config.from_object(__name__)
-Session(app)
-'''
 # SQLAlchemy Models
 class User(db.Model):
     __tablename__ = 'User'
@@ -97,8 +92,8 @@ if setup:
     db.create_all()
 
 # Spotify Oauth2 Api Access Stuff
-client_id = '8e444e79ae284509aed0c135b2bf555a'
-client_secret = 'ee58df103e0043df970fc00d50a81ccb'
+client_id = os.environ['SPOTIFY_CLIENT_ID']
+client_secret = os.environ['SPOTIFY_CLIENT_SECRET']
 redirect_uri = 'http://sorter.sampeters.me/callback'
 scope='user-library-read user-read-private playlist-modify-public'
 sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, scope= scope)
@@ -420,16 +415,6 @@ def dl_user_lib(user):
 
     return library
 
-def check_duplicates(saved_tracks_list):
-    saved_tracks = [(t['name'], t['id']) for t in saved_tracks_list]
-    new_list = []
-    print(f"There are {len(saved_tracks_list)} tracks in nonfiltered list")
-    for t in saved_tracks:
-        if t[0] in new_list:
-            print(f"{t[0]} is already in the list")
-        else:
-            new_list.append(t[0])
-    print(len(new_list))
 
 def refresh_user_tracks(user):
     "Gets user and adds user tracks to database, removing old songs of user"
@@ -454,7 +439,7 @@ def refresh_user_tracks(user):
     return 'It worked'
 
 def dl_track_features(user, tracks):
-
+    """ Gets data about the features of each track in a User's library """
     # create instance of the Spotify client
     sp = spotipy.client.Spotify(auth=user.access_token)
     
@@ -488,6 +473,7 @@ def centroids_from_array(k, A):
     return random_subarray
 
 def kplusplus_centroids(k,A):
+    """ Improved initialization of centroids using k-means++ method described here: http://ilpubs.stanford.edu:8090/778/1/2006-13.pdf """
     choice = random.choice(range(len(A)))
     seed = A[choice]
     centroids = np.array([seed])
@@ -554,6 +540,7 @@ def eval_cluster_accuracy(A, bools, centroids):
     return sum
 
 def repeated_cluster(user, k, r, features):
+    """ Clusters a User's tracks repeatedly, returning the best result """
     for k in range(12,13):
         start = time.time()
         track_objs, A = user.lib_as_array(features)
