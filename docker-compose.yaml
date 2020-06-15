@@ -1,0 +1,25 @@
+version: '3'
+services:
+  web:
+    build: ./web
+    volumes:
+      - ./web:/usr/src/app
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    environment:
+      - SECRET_KEY=${FLASK_SECRET}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - DATABASE_URL=postgresql://sam:dPJPfXpGmpxrtkyI@db:5432/tracks
+
+  db:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=sam
+      - POSTGRES_PASSWORD=dPJPfXpGmpxrtkyI
+      - POSTGRES_DB=spotify

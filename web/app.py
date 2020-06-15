@@ -10,12 +10,12 @@ import numpy as np
 import os
 
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key= os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_ECHO'] = False
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+time.sleep(10)
 db = SQLAlchemy(app)
 # SQLAlchemy Models
 class User(db.Model):
@@ -94,11 +94,12 @@ if setup:
 # Spotify Oauth2 Api Access Stuff
 client_id = os.environ['SPOTIFY_CLIENT_ID']
 client_secret = os.environ['SPOTIFY_CLIENT_SECRET']
-redirect_uri = 'http://sorter.sampeters.me/callback'
+print(len(client_id))
+print(client_id)
+redirect_uri = 'http://167.114.67.158:5000/callback'
 scope='user-library-read user-read-private playlist-modify-public'
 sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, scope= scope)
-
-
+print(sp_oauth.get_authorize_url())
 """ Spotify API Functions """
 def save_playlist_to_spotify(user, cluster):
     check_auth(user)
@@ -648,6 +649,7 @@ def index():
 
     else:
         redir = sp_oauth.get_authorize_url()
+        print(redir)
         css = url_for('static', filename='unverified.css')
         return render_template('unverified.html', css = css, redirect_url = redir, favicon=favicon)
 
@@ -701,7 +703,14 @@ def refresh_lib():
         return 'refresh already ran'
 
 
+@app.route('/dbtest')
+def dbtest():
+    try:
+        db.session.query("1").from_statement("SELECT 1").all()
+        return "It works"
+    except:
+        return "doesn't work"
 
 
 if __name__ == '__main__':
-   app.run(debug= True)
+   app.run(host='0.0.0.0', port=5000, debug= True)
