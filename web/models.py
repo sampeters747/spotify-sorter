@@ -21,7 +21,7 @@ class User(db.Model, UserMixin):
     access_token= db.Column(db.String(300))
     access_expires= db.Column(db.Integer)
     refresh_token= db.Column(db.String())
-    tracks = db.relationship('track', secondary='user_tracks', backref=db.backref('users'))
+    tracks = db.relationship('Track', secondary='user_tracks', backref=db.backref('users'))
 
     def has_access_token(self):
         return self.access_token is not None

@@ -15,8 +15,11 @@ class Config:
             f'postgresql://{DB_USER}:{DB_PW}@db:5432/spotify')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
-    SCOPE = 'user-library-read user-read-private playlist-modify-public'
+    SCOPE = 'user-library-read user-read-private'
     RECREATE_TABLES = environ.get('RECREATE_TABLES', 'True') == 'True'
+
+    FEATURE_LIST = ['acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness',
+            'loudness', 'speechiness', 'valence', 'key', 'tempo', 'mode']
 
 app = Flask("__main__")
 app.config.from_object(Config)

@@ -10,7 +10,6 @@ db = models.db
 login_manager = models.login_manager
 oauth_client = spotify_api.oauth_client
 
-
 @app.route('/')
 def index():
     return redirect(oauth_client.get_authorize_url())
@@ -48,6 +47,8 @@ def tempce():
 
 @app.route('/show_user')
 def show_user():
+    spotify_api.download_user_library(current_user)
+    spotify_api.download_track_features(current_user)
     return tempce()
 
 @app.route('/logout')
