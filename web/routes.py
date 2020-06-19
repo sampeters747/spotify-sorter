@@ -2,6 +2,7 @@ import config_app
 from flask import request, session, redirect, url_for, render_template
 from flask_login import login_user, logout_user, current_user, login_required
 import models
+import process_songs as ps
 import spotipy
 import spotify_api
 
@@ -41,15 +42,32 @@ def callback():
     
     return redirect(url_for('show_user'))
 
+@app.route('/fetch_library')
+@login_required
+def fetch_library():
+    spotify_api.download_user_library(current_user)
+    return "test"
 
-def tempce():
-    return current_user.display_name
+@app.route('/fetch_features')
+@login_required
+def fetch_features():
+    spotify_api.download_track_features(current_user)
+    return "test2"
+
+@app.route('/first_n')
+def first_n():
+    track_id = models.Track.query.filter_by(title="Elephant").first().track_id
+    if track_id:
+        playlist = ps.closest_n_songs(current_user, track_id, 10)
+        out = ps.stringify_playlist(playlist, included_features=['tempo', 'energy', 'valence', 'instrumentalness'])
+    app.logger.info(out)
+    return out 
 
 @app.route('/show_user')
 def show_user():
-    spotify_api.download_user_library(current_user)
-    spotify_api.download_track_features(current_user)
-    return tempce()
+    #spotify_api.download_user_library(current_user)
+    #spotify_api.download_track_features(current_user)
+    return current_user.display_name
 
 @app.route('/logout')
 @login_required

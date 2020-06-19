@@ -1,7 +1,7 @@
 from os import environ
 from flask import Flask
-print('hi')
 class Config:
+    FLASK_ENV = "development"
     SPOTIFY_CLIENT_ID = environ.get('SPOTIFY_CLIENT_ID',
             'CHANGEME')
     SPOTIFY_CLIENT_SECRET = environ.get('SPOTIFY_CLIENT_SECRET',
@@ -16,7 +16,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
     SCOPE = 'user-library-read user-read-private'
-    RECREATE_TABLES = environ.get('RECREATE_TABLES', 'True') == 'True'
+    RECREATE_TABLES = environ.get('RECREATE_TABLES', 'False') == 'True'
 
     FEATURE_LIST = ['acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness',
             'loudness', 'speechiness', 'valence', 'key', 'tempo', 'mode']

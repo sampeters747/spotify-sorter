@@ -1,6 +1,9 @@
+""" Files holds all the code necessary for the application to request/store/modify a spotify user's data provided they went through the OAuth process
+and we have a User object representing them stored in our DB """
 import config_app
 from math import ceil
 import models
+import random
 import spotipy
 from spotipy import oauth2
 
@@ -17,11 +20,10 @@ db = models.db
 
 
 def get_api_client(user):
-    """ Creates a User specific spotify client that uses their access token """
+    """ Creates a User specific spotify client that uses their access token to make Spotify API requests """
     if user.is_access_expired():
         user.refresh_access_token(oauth_client)
     return spotipy.client.Spotify(user.access_token)
-
 
 
 def download_user_library(user):
@@ -57,7 +59,7 @@ def download_user_library(user):
     db.session.commit()
 
 def download_track_features(user):
-    """ Requests feature data for all the tracks in a User's library from Spotify's API """
+    """ Requests feature data for all the tracks in user.tracks from Spotify's API """
     client = get_api_client(user)
     resp_items = []
     # We request feature info for tracks in batches of 100
@@ -73,6 +75,25 @@ def download_track_features(user):
             for feature in Config.FEATURE_LIST:
                 setattr(user.tracks[i], feature, item[feature])
         else:
-            print(item)
             raise ValueError
     db.session.commit()
+
+def get_playlist_name():
+    with open(Config.PLAYLIST_NAME_FILEPATH) as f:
+        random.choice
+
+
+def save_playlist_to_spotify(user, playlist):
+    """ Creates a new public spotify playlist owned by the user
+    playlist: list of track_ids
+    """
+    client = get_api_client(user)
+    playlist_name = get_playlist_name()
+    response = client.user_playlist_create(user.id, playlist_name)
+    playlist_id = response['id']
+    for i in range(len(playlist), 100):
+        client.user_playlist_add_tracks(user.id, playlist_id, playlist[i:i+100])
+    app.logger.info(f"User: {user.display_name} saved a playlist named: {playlist_name}, of length: {len(playlist)} to their account")
+
+
+
