@@ -40,7 +40,7 @@ def normalize_array(x):
     """ Divides every element by the max element in its column 
     Returns a new array where each element is between 0 and 1 inclusive
     """
-    return x/x.max(axis=0)
+    return (x - x.min(0)) / x.ptp(0)
 
 
 def closest_n_songs(user, seed_track_id, n, debug=False):

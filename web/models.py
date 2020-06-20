@@ -74,6 +74,11 @@ class Track(db.Model):
     tempo = db.Column(db.Float)
     saved_by = db.Column(db.String())
 
+    def serialize(self, cols=None):
+        if cols is None:
+            cols = self.__table__.columns.keys()
+        return {c: getattr(self, c) for c in cols}
+
 user_tracks = db.Table('user_tracks',
         db.Column('user_id', db.String(), db.ForeignKey('user.id'), primary_key=True),
         db.Column('track_id', db.String(), db.ForeignKey('track.track_id'), primary_key=True)

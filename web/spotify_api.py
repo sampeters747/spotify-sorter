@@ -13,7 +13,8 @@ redirect_url = 'http://167.114.67.158:5000/callback'
 oauth_client = oauth2.SpotifyOAuth(client_id=Config.SPOTIFY_CLIENT_ID,
 					client_secret=Config.SPOTIFY_CLIENT_SECRET,
 					redirect_uri=redirect_url,
-					scope=Config.SCOPE)
+					scope=Config.SCOPE,
+                                        username="default")
 
 app = config_app.app
 db = models.db
@@ -80,8 +81,8 @@ def download_track_features(user):
 
 def get_playlist_name():
     with open(Config.PLAYLIST_NAME_FILEPATH) as f:
-        random.choice
-
+        name = random.choice(f.readlines())
+    return name
 
 def save_playlist_to_spotify(user, playlist):
     """ Creates a new public spotify playlist owned by the user
@@ -89,9 +90,9 @@ def save_playlist_to_spotify(user, playlist):
     """
     client = get_api_client(user)
     playlist_name = get_playlist_name()
-    response = client.user_playlist_create(user.id, playlist_name)
+    response = client.user_playlist_create(user.id, playlist_name, description="Created using sorter.sampeters.me")
     playlist_id = response['id']
-    for i in range(len(playlist), 100):
+    for i in range(0, len(playlist), 100):
         client.user_playlist_add_tracks(user.id, playlist_id, playlist[i:i+100])
     app.logger.info(f"User: {user.display_name} saved a playlist named: {playlist_name}, of length: {len(playlist)} to their account")
 
