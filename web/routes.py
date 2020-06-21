@@ -26,13 +26,14 @@ def callback():
     code = oauth_client.parse_response_code(request.url)
     # Checking if url actually included a code param
     if code != request.url:
-        response = oauth_client.get_access_token(code)
+        response = oauth_client.get_access_token(code, check_cache=False)
         # User specific oauth client that communicates with Spotify's API
-        sp_user_client = spotipy.client.Spotify(auth=response['access_token'])
+        sp_user_client = spotipy.client.Spotify(response['access_token'])
         me = sp_user_client.me()
         existing_user = models.User.query.filter_by(id=me['id']).first()
         # Checking if existing user stored in our DB
         if existing_user:
+            app.logger.info("Existing user logged in")
             login_user(existing_user)
         else:
             new_user = models.User(id=me['id'], 
@@ -46,7 +47,7 @@ def callback():
     else:
         return "Error, no code was sent from spotify"
     
-    return redirect(url_for('show_user'))
+    return redirect(url_for('demo'))
 
 @app.route('/fetch_library')
 @login_required
@@ -63,24 +64,21 @@ def fetch_features():
     return "test2"
 
 @app.route('/first_n', methods=['POST'])
-@login_required
 def first_n():
-    resp_dict = {}
-    form = request.form.to_dict(flat=False)
-    app.logger.info(form)
-    track_id = models.Track.query.filter_by(title=form['seed_track_input'][0]).first().track_id
     if current_user.is_authenticated:
         user = current_user
     else:
         user = models.User.query.filter_by(display_name=Config.DEFAULT_USER).first()
-    if track_id:
-        playlist = ps.closest_n_songs(user, track_id, 10)
+    resp_dict = {}
+    form = request.form.to_dict(flat=False)
+    seed_track = models.Track.query.filter_by(title=form['seed_track_input'][0]).first()
+    if seed_track:
+        playlist = ps.closest_n_songs(user, seed_track.track_id, 10)
         out = ps.stringify_playlist(playlist, included_features=['tempo', 'energy', 'valence', 'instrumentalness'])
         resp_dict['playlist'] = [t.serialize() for t in playlist]
         resp_dict['status'] = True
     else:
         resp_dict['status'] = False
-    app.logger.info(out)
     return jsonify(resp_dict)
 
 @app.route('/show_user')
@@ -107,6 +105,28 @@ def show_tracks():
         resp_dict['status'] = True
         resp_dict['tracks'] = [t.serialize() for t in default_user.tracks]
         return jsonify(resp_dict)
+
+@app.route('/save_playlist', methods=['POST'])
+@login_required
+def save_playlist():
+    form = request.form.to_dict(flat=False)
+    resp_dict = {}
+    app.logger.info('playlist[]' in form)
+    app.logger.info(form['playlist[]'])
+
+    if form:
+        spotify_api.save_playlist_to_spotify(current_user, form['playlist[]'])
+        """
+        try:
+            playlist_name = spotify_api.save_playlist_to_spotify(current_user, form['playlist'])
+            resp_dict['status'] = True
+            resp_dict['playlist_name'] = playlist_name
+        except:
+            resp_dict['status'] = False
+        """
+    else:
+        resp_dict['status'] = False
+    return jsonify(resp_dict)
 
 
 @app.route('/logout')

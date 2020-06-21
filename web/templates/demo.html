@@ -1,7 +1,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrionk-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="Demo page for spotify-sorter project">
 		<meta name="author" content="Sam Peters">
 		<title> Spotify Sorter Demo </title>
@@ -51,7 +51,7 @@
 						<th scope="col">#</th>
 						<th scope="col">Title</th>
 						<th scope="col">Artist</th>
-						<th scope="col">Preview Url</th>
+						<th scope="col"><input type="submit" id="save_button" class="btn btn-primary mb-2" value="Save Playlist"></th>
 					</tr>
 				</thead>
 				<tbody id='playlist_body'>
@@ -75,6 +75,18 @@ $(document).ready(function(){
 	$("#playlist_form").submit(function(e){
 		e.preventDefault();
 	});
+
+	$("#save_button").click(function(e){
+		e.preventDefault();
+		console.log($("#playlist_view").data("playlist"));
+		var playlist_ids = $("#playlist_view").data("playlist");
+		$.post('save_playlist', {'playlist':playlist_ids},
+			function(data) {
+				console.log(data);
+				console.log("Playlist saved");
+			}
+		);
+	});
 	$("#submit_button").click(function(e){
 		e.preventDefault();
 		var form_data = $("#playlist_form").serialize();
@@ -83,13 +95,25 @@ $(document).ready(function(){
 			function(data){
 				if (data.status){
 					var playlist = data.playlist;
+					console.log(playlist);
+					var playlist_ids = [];
+					for (var j = 0; j<playlist.length; j++){
+						playlist_ids.push(playlist[j].track_id);
+					};
+
+					$("#playlist_view").data('playlist', playlist_ids);
+					console.log("trying to save playlist data");
+					console.log($("#playlist_view").data('playlist'));
 					var table_html = '';
 					$("#playlist_body").html('');
 					for (var i = 1; i<=playlist.length; i++) {
 						table_html += '<tr>'+'<th scope="row">'+i.toString()+'</th>';
-						table_html += '<td>'+playlist[i-1].title+'<td>';
-						table_html += '<td>'+playlist[i-1].artist+'<td>';
+						table_html += '<td>'+playlist[i-1].title+'</td>';
+						table_html += '<td>'+playlist[i-1].artist+'</td>';
+						if (playlist[i-1].preview_url != "null"){
 						table_html += '<td><a href='+playlist[i-1].preview_url+'>Link to song preview</a></td>'+'</tr>';
+						}
+						else {table_html += '</tr>';}
 					};
 					$("#playlist_body").html(table_html);
 					$("#playlist_table").show();
