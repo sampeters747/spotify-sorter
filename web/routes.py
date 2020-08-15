@@ -81,6 +81,27 @@ def first_n():
         resp_dict['status'] = False
     return jsonify(resp_dict)
 
+@app.route('/cluster', methods=['GET','POST'])
+def cluster_library():
+    if current_user.is_authenticated:
+        user = current_user
+    else:
+        user = models.User.query.filter_by(display_name=Config.DEFAULT_USER).first()
+    resp_dict = {}
+    try:
+        form = request.form.to_dict(flat=False)
+        number_of_clusters = form.get("cluster_number", default = 10)
+        number_of_repetitions = form.get("repetition_number", default = 30)
+    except:
+        number_of_clusters = 10
+        number_of_repetitions = 30
+        print("Retrieving form data failed")
+    clusters = ps.run_library_clustering(user, number_of_clusters, number_of_repetitions)
+    serialized_clusters = [[t.serialize() for t in cluster] for cluster in clusters]
+    resp_dict['clusters'] = serialized_clusters
+    return jsonify(resp_dict)
+      
+
 @app.route('/show_user')
 def show_user():
     return current_user.display_name
