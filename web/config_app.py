@@ -21,7 +21,7 @@ class Config:
     FEATURE_LIST = ['acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness',
             'loudness', 'speechiness', 'valence', 'key', 'tempo', 'mode']
 
-    PLAYLIST_NAME_FILEPATH = 'animals.txt'
+    PLAYLIST_NAME_FILEPATH = 'playlist_names.txt'
     DEFAULT_USER = 'what'
 app = Flask("__main__")
 app.config.from_object(Config)
