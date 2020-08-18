@@ -22,6 +22,6 @@ class Config:
             'loudness', 'speechiness', 'valence', 'key', 'tempo', 'mode']
 
     PLAYLIST_NAME_FILEPATH = 'playlist_names.txt'
-    DEFAULT_USER = 'what'
+    DEFAULT_USER = '5ayem'
 app = Flask("__main__")
 app.config.from_object(Config)

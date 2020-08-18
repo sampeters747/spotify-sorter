@@ -5,6 +5,7 @@
 		<meta name="description" content="Demo page for spotify-sorter project">
 		<meta name="author" content="Sam Peters">
 		<title> Spotify Sorter Demo </title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='demo.css') }}">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 		<script
 		       src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
@@ -31,34 +32,35 @@
 		</nav>
 
 		<main role="main" class="container">
-		
-		<form id="cluster_form">
-		<div id="form-section" class="form-row">
-			<div class="col">
-			<label for="formPlaylistNumberRange">Choose the number of playlists you want to divide your library into</label>
-			<input type="range" name="cluster_number" class="form-control-range" id="formPlaylistNumberRange" min="3" max="50" value="10"> 
-			<label for="formControlRange">Choose the amount of time our algorithm spends processing your library</label>
-			<input type="range" name="repetition_number" class="form-control-range" id="formControlRange" min="0" max="30" value="10"> 
-			</div>
+		<div class="container">
+			<div class="row">
+				<div style="padding-bottom: 60px; margin-right: 5px; padding-top: 10px; margin-bottom: 10px" class="col w-100 border rounded">
+					<h5 style="text-align: center">Single Playlist</h5>
+					<form id="playlist_form">
+								<label for="seed_track_input">Base track</label>
+								<input id="seed_track_input" name="seed_track_input" class="form-control mb-2" placeholder="Choose a track to base the playlist on" list="user_tracks">
+								<datalist id="user_tracks"></datalist>
+					</form>
+					<input type="submit" id="submit_button" class="btn btn-primary mb-2 positionSubmitButton" value="Create Playlist">
+				</div>
+				<div style="padding-bottom: 60px; margin-left: 5px; padding-top: 10px; margin-bottom: 10px;" class="col w-100 border rounded">
+					<h5 style="text-align: center">Multiple Playlists</h5>
+					<form id="cluster_form">
+						<div id="form-section" class="form-row">
+								<label for="formPlaylistNumberRange">Number of playlists</label>
+								<input type="range" name="cluster_number" class="form-control-range" id="formPlaylistNumberRange" min="3" max="50" value="10"> 
+								<label for="formControlRange">Processing time</label>
+								<input type="range" name="repetition_number" class="form-control-range" id="formControlRange" min="0" max="30" value="10">
+						</div>
+					</form>
+					<input type="submit" id="cluster_submit_button" class="btn btn-primary mb-2 positionSubmitButton" value="Create Playlists">
 
-			<div class="col-auto">
-			<input type="submit" id="cluster_submit_button" class="btn btn-primary mb-2" value="Create Playlists">
+				</div>
 			</div>
-		</div>
-		</form>
-		<form id="playlist_form">
-		<div id="form-section" class="form-row">
-			<div class="col">
-			<input id="seed_track_input" name="seed_track_input" class="form-control mb-2" placeholder="Choose a track from your library to base your new playlist on" list="user_tracks">
-			<datalist id="user_tracks"></datalist>
-			</div>
+				
+			
 
-			<div class="col-auto">
-			<input type="submit" id="submit_button" class="btn btn-primary mb-2" value="Create Playlist">
-			</div>
 		</div>
-		</form>
-		
 		<div id="playlists_view" >
 		</div>
 		</main>
@@ -158,3 +160,4 @@ $(document).ready(function(){
 
 </script>
 	</body>
+</html>

@@ -126,6 +126,7 @@ def show_tracks():
         return jsonify(resp_dict)
     else:
         default_user = models.User.query.filter_by(display_name=Config.DEFAULT_USER).first()
+        app.logger.info(default_user)
         resp_dict['status'] = True
         resp_dict['tracks'] = [t.serialize() for t in default_user.tracks]
         return jsonify(resp_dict)
