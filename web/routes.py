@@ -11,15 +11,16 @@ Config = config_app.Config
 db = models.db
 login_manager = models.login_manager
 oauth_client = spotify_api.oauth_client
-
+authorize_url = oauth_client.get_authorize_url()
 @app.route('/')
 def index():
-    return redirect(oauth_client.get_authorize_url())
+    return render_template('index.html', user_browser=request.user_agent.browser, authorize_url=authorize_url)
 
 @app.route('/demo')
 def demo():
     """ Demo view lets people create new playlist using a premade demo library, but doesn't let user save the playlists """
-    return render_template('demo.html')
+    app.logger.info(request.user_agent.browser)
+    return render_template('demo.html', user_browser=request.user_agent.browser, authorize_url=authorize_url)
 
 @app.route('/callback')
 def callback():
@@ -93,21 +94,12 @@ def cluster_library():
     number_of_clusters = int(form["cluster_number"][0])
     number_of_repetitions = int(form["repetition_number"][0])
     app.logger.info(str(number_of_clusters))
-    #except:
-     #   number_of_clusters = 10
-      #  number_of_repetitions = 30
-      #  app.logger.info("Retrieving form data failed")
     clusters = ps.run_library_clustering(user, number_of_clusters, number_of_repetitions)
     serialized_clusters = [[t.serialize() for t in cluster] for cluster in clusters]
     resp_dict['clusters'] = serialized_clusters
     resp_dict['status'] = True
-    print(jsonify(resp_dict))
     return jsonify(resp_dict)
       
-
-@app.route('/show_user')
-def show_user():
-    return current_user.display_name
 
 @app.route('/show_tracks')
 def show_tracks():
@@ -158,4 +150,4 @@ def save_playlist():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('show_user'))
+    return redirect(url_for('demo'))

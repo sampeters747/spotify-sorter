@@ -88,6 +88,7 @@ def initialize_centroids(k, A):
 def run_library_clustering(user, cluster_number, repetition_number):
     track_objs, tracks_feature_data = user_lib_as_arrays(user)
     normalized_tracks_feature_data = normalize_array(tracks_feature_data)
+    cluster_number = min(cluster_number, len(user.tracks)//10)
     clusters = k_means_clusters(normalized_tracks_feature_data, track_objs, cluster_number, repetition_number)
     return clusters
     
