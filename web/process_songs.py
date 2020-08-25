@@ -63,7 +63,7 @@ def closest_n_songs(user, seed_track_id, n, debug=False):
     indices = np.argsort(distances_from_seed_track)
     print(indices[:50], len(track_objects))
     sorted_tracks = track_objects[indices]
-    result = np.concatenate(([seed_track], sorted_tracks[:n]))
+    result = np.concatenate(([seed_track], sorted_tracks[:n-1]))
     return result
 
 def initialize_centroids(k, A):

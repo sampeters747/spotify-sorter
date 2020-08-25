@@ -48,7 +48,7 @@ def callback():
     else:
         return "Error, no code was sent from spotify"
     
-    return redirect(url_for('demo'))
+    return redirect(url_for('index'))
 
 @app.route('/fetch_library')
 @login_required
@@ -66,15 +66,19 @@ def fetch_features():
 
 @app.route('/first_n', methods=['POST'])
 def first_n():
-    if current_user.is_authenticated:
+    form = request.form.to_dict(flat=False)
+    demo = form['demo']
+    app.logger.info(f"Firstn function found demo value was {demo}")
+    if current_user.is_authenticated and demo == 'false':
         user = current_user
     else:
         user = models.User.query.filter_by(display_name=Config.DEFAULT_USER).first()
     resp_dict = {}
-    form = request.form.to_dict(flat=False)
+    
     seed_track = models.Track.query.filter_by(title=form['seed_track_input'][0]).first()
+    playlist_legnth = min(int(form['playlist_length'][0]), len(user.tracks))
     if seed_track:
-        playlist = ps.closest_n_songs(user, seed_track.track_id, 10)
+        playlist = ps.closest_n_songs(user, seed_track.track_id, playlist_legnth)
         out = ps.stringify_playlist(playlist, included_features=['tempo', 'energy', 'valence', 'instrumentalness'])
         resp_dict['playlist'] = [t.serialize() for t in playlist]
         resp_dict['status'] = True
@@ -84,16 +88,16 @@ def first_n():
 
 @app.route('/cluster', methods=['GET','POST'])
 def cluster_library():
+    form = request.form.to_dict(flat=False)
+    demo = form['demo'][0]
     if current_user.is_authenticated:
         user = current_user
     else:
         user = models.User.query.filter_by(display_name=Config.DEFAULT_USER).first()
     resp_dict = {}
     
-    form = request.form.to_dict(flat=False)
     number_of_clusters = int(form["cluster_number"][0])
     number_of_repetitions = int(form["repetition_number"][0])
-    app.logger.info(str(number_of_clusters))
     clusters = ps.run_library_clustering(user, number_of_clusters, number_of_repetitions)
     serialized_clusters = [[t.serialize() for t in cluster] for cluster in clusters]
     resp_dict['clusters'] = serialized_clusters
@@ -101,11 +105,16 @@ def cluster_library():
     return jsonify(resp_dict)
       
 
-@app.route('/show_tracks')
+@app.route('/show_tracks', methods=['GET', 'POST'])
 def show_tracks():
     """ Returns json data for all the tracks in a user's library """
     resp_dict = {}
-    if current_user.is_authenticated:
+    data = request.form.to_dict(flat=False)
+    app.logger.info(data)
+    demo = data['demo'][0]
+    app.logger.info(demo)
+    if current_user.is_authenticated and demo == 'false':
+        app.logger.info("Showing current user's tracks")
         resp_dict = {}
         if len(current_user.tracks) != 0:
             resp_dict['status'] = True
@@ -117,8 +126,8 @@ def show_tracks():
             resp_dict['tracks'] = [t.serialize() for t in current_user.tracks]
         return jsonify(resp_dict)
     else:
+        app.logger.info("Showing default user's tracks")
         default_user = models.User.query.filter_by(display_name=Config.DEFAULT_USER).first()
-        app.logger.info(default_user)
         resp_dict['status'] = True
         resp_dict['tracks'] = [t.serialize() for t in default_user.tracks]
         return jsonify(resp_dict)
@@ -128,8 +137,6 @@ def show_tracks():
 def save_playlist():
     form = request.form.to_dict(flat=False)
     resp_dict = {}
-    app.logger.info('playlist[]' in form)
-    app.logger.info(form['playlist[]'])
 
     if form:
         spotify_api.save_playlist_to_spotify(current_user, form['playlist[]'])
@@ -150,4 +157,4 @@ def save_playlist():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('demo'))
+    return redirect(url_for('index'))

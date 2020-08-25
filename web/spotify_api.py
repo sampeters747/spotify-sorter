@@ -9,7 +9,7 @@ from spotipy import oauth2
 
 Config = config_app.Config
 
-redirect_url = 'http://167.114.67.158:5000/callback'
+redirect_url = 'http://sorter.sampeters.me/callback'
 oauth_client = oauth2.SpotifyOAuth(client_id=Config.SPOTIFY_CLIENT_ID,
 					client_secret=Config.SPOTIFY_CLIENT_SECRET,
 					redirect_uri=redirect_url,
