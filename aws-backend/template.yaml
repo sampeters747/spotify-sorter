@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: HTTP API
+  
+Globals:
+  Function:
+    Timeout: 5
+    MemorySize: 128
+    Runtime: nodejs14.x
+
+Parameters:
+  SpotifyIdParameter:
+    NoEcho: true
+    Type: String
+    Description: Application's Spotify client id.
+    MinLength: 1
+  SpotifySecretParameter:
+    NoEcho: true
+    Type: String
+    Description: Application's Spotify client secret.
+    MinLength: 1
+  JWTSecretParameter:
+    NoEcho: true
+    Type: String
+    Description: String used to sign application JWTs.
+    MinLength: 1
+
+
+Resources:
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: 
+      CodeUri: lambdas/login
+      Handler: login.lambdaHandler
+      Layers:
+        - !Ref Dependencies
+      Environment:
+        Variables:
+          SPOTIFY_CLIENT_ID: !Ref SpotifyIdParameter
+          SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
+          TOKEN_SECRET: !Ref JWTSecretParameter
+      Events:
+        LoginEvent:
+          Type: Api 
+          Properties:
+            Path: /login
+            Method: get
+
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/auth
+      Handler: auth.lambdaHandler
+      Layers:
+        - !Ref Dependencies
+      Events:
+        AuthEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /second
+            Method: get
+
+  Dependencies:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: SharedNodeDependencies
+      Description: Node dependencies shared by multiple lambdas.
+      ContentUri: layers/dependencies/.
+      CompatibleRuntimes:
+          - nodejs14.x
+      RetentionPolicy: Delete
+    Metadata:
+        BuildMethod: nodejs14.x
+
+Outputs:
+  LoginApi:
+    Description: "API Gateway endpoint URL for Prod stage for login function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/login/"
+  LoginFunction:
+    Description: "Login Lambda Function ARN"
+    Value: !GetAtt LoginFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Login function"
+    Value: !GetAtt LoginFunctionRole.Arn

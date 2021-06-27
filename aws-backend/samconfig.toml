@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "Playlist-Stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1faa6ofiogdt9"
+s3_prefix = "Playlist-Stack"
+region = "us-west-2"
+capabilities = "CAPABILITY_IAM"
