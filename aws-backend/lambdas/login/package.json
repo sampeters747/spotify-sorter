@@ -1,0 +1,19 @@
+{
+  "name": "login",
+  "version": "1.0.0",
+  "description": "Takes authorization code and logs user into application",
+  "main": "app.js",
+  "repository": "https://github.com/sampeters747/spotify-sorter",
+  "author": "Sam Peters",
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha tests/unit/"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}
