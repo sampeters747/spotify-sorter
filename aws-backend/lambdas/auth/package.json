@@ -1,0 +1,19 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "Lambda token authorizor verifies the client provides a valid access token",
+  "main": "auth.js",
+  "repository": "https://github.com/sampeters747/spotify-sorter",
+  "author": "Sam Peters",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1"
+  },
+  "scripts": {
+    "test": "mocha tests/unit/"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1"
+  }
+}
