@@ -1,39 +1,6 @@
 const axios = require('axios')
 const jwt = require("jsonwebtoken");
 
-/**
- * Sends a request to https://accounts.spotify.com/api/token to get access and refresh
- * tokens for a user
- * @async
- * @param {String} code Authorization code from Spotify web api
- * @returns {Promise<object>} Object containing access, refresh tokens
- */
-async function getSpotifyUserTokens(code) {
-    const endpoint = 'https://accounts.spotify.com/api/token'
-    const redirectUri = "http://localhost:3000"
-    const clientId = process.env.SPOTIFY_CLIENT_ID
-    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
-    // Configuring request to Spotify token service
-    const axiosConfig = {
-        method: 'post',
-        url: endpoint,
-        headers: {
-            Authorization: 'Basic ' + (Buffer.from(clientId + ':' + clientSecret).toString('base64'))
-        },
-        params: {
-            code: code,
-            redirect_uri: redirectUri,
-            grant_type: 'authorization_code'
-        }
-    };
-    try {
-        const { data } = await axios(axiosConfig)
-        return data;
-    } catch (error) {
-        console.error("Invalid authorization code: " + code);
-        return null;
-    }
-}
 
 /**
  * Creates a JWT using the environment variable TOKEN_SECRET as the secret key
@@ -62,4 +29,4 @@ function verifyJWT(token) {
     }
 }
 
-module.exports = { getSpotifyUserTokens, signJWT, verifyJWT }
+module.exports = { signJWT, verifyJWT }

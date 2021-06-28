@@ -24,6 +24,9 @@ Parameters:
     Type: String
     Description: String used to sign application JWTs.
     MinLength: 1
+  AWSParameter:
+    Type: String
+    Description: Indicates what environment functions are executing in.
 
 
 Resources:
@@ -32,7 +35,7 @@ Resources:
     Properties:
       Description: 
       CodeUri: lambdas/login
-      Handler: login.lambdaHandler
+      Handler: login2.lambdaHandler
       Layers:
         - !Ref Dependencies
       Environment:
@@ -40,12 +43,13 @@ Resources:
           SPOTIFY_CLIENT_ID: !Ref SpotifyIdParameter
           SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
           TOKEN_SECRET: !Ref JWTSecretParameter
+          AWS: !Ref AWSParameter
       Events:
         LoginEvent:
           Type: Api 
           Properties:
             Path: /login
-            Method: get
+            Method: post
 
   AuthFunction:
     Type: AWS::Serverless::Function
