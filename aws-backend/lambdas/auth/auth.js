@@ -1,29 +1,34 @@
-const axios = require('axios')
+const axios = require('axios');
+const { findCookieValue, verifyJWT } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layers/dependencies/utils");
 // const url = 'http://checkip.amazonaws.com/';
-let response;
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Context doc: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html 
- * @param {Object} context
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- * 
- */
+
 exports.lambdaHandler = async (event, context) => {
+    let response;
     try {
-        const ret = await axios('https://jsonplaceholder.typicode.com/todos/1')
-            .then(response => response)
-            .catch(error => error);
-        response = JSON.stringify(ret)
-    } catch (err) {
-        console.log(err);
-        return err;
+        const cookies = event.cookies;
+        const token = findCookieValue(cookies, "jwt");
+        const payload = verifyJWT(token);
+        response = {
+            "isAuthorized": true,
+            "context": {
+                "scope": payload.scope,
+                "accessToken": payload.accessToken,
+                "refreshToken": payload.refreshToken,
+                "expiresIn": payload.expiresIn
+            }
+        };       
+    } catch (error) {
+        console.log(error.message);
+        response = {
+            "isAuthorized": true,
+            "context": {
+                "scope": payload.scope,
+                "accessToken": payload.accessToken,
+                "refreshToken": payload.refreshToken,
+                "expiresIn": payload.expiresIn
+            }
+        };
     }
-
-    return response
+    return response;
 };

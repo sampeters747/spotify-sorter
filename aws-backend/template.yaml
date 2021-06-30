@@ -30,12 +30,34 @@ Parameters:
 
 
 Resources:
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: "Prod"
+      CorsConfiguration:
+        AllowOrigins:
+          - "http://localhost:3000"
+        MaxAge: 20
+        AllowCredentials: true
+      Auth:
+        DefaultAuthorizer: LambdaRequestAuthorizer
+        Authorizers:
+          LambdaRequestAuthorizer:
+            FunctionArn: !GetAtt AuthFunction.Arn
+            FunctionInvokeRole: !GetAtt AuthFunctionRole.Arn
+            Identity:
+              Headers:
+                - Cookie
+              ReauthorizeEvery: 0
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+
   LoginFunction:
     Type: AWS::Serverless::Function
     Properties:
       Description: 
       CodeUri: lambdas/login
-      Handler: login2.lambdaHandler
+      Handler: login.lambdaHandler
       Layers:
         - !Ref Dependencies
       Environment:
@@ -46,10 +68,13 @@ Resources:
           AWS: !Ref AWSParameter
       Events:
         LoginEvent:
-          Type: Api 
+          Type: HttpApi 
           Properties:
+            ApiId: !Ref MyHttpApi
             Path: /login
             Method: post
+            Auth:
+              Authorizer: NONE
 
   AuthFunction:
     Type: AWS::Serverless::Function
@@ -60,9 +85,10 @@ Resources:
         - !Ref Dependencies
       Events:
         AuthEvent:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: HttpApi
           Properties:
-            Path: /second
+            ApiId: !Ref MyHttpApi
+            Path: /auth
             Method: get
 
   Dependencies:
@@ -80,10 +106,10 @@ Resources:
 Outputs:
   LoginApi:
     Description: "API Gateway endpoint URL for Prod stage for login function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/login/"
+    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/login/"
   LoginFunction:
     Description: "Login Lambda Function ARN"
     Value: !GetAtt LoginFunction.Arn
-  HelloWorldFunctionIamRole:
+  LoginFunctionIamRole:
     Description: "Implicit IAM Role created for Login function"
     Value: !GetAtt LoginFunctionRole.Arn

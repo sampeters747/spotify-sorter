@@ -1,6 +1,20 @@
 const axios = require('axios')
 const jwt = require("jsonwebtoken");
 
+/**
+ * Returns the value of a specific cookie in a array of cookie strings
+ * @param {Array.<string>} cookies Array of cookie strings, ex. ['cookieName=val1', 'secondCookieName=val2'] 
+ * @param {string} cookieName Name of the cookie whose value we want to return
+ * @returns {string} Value of the cookie we wanted to find
+ */
+function findCookieValue(cookies, cookieName) {
+    const fullCookie = cookies.find(element => element.split("=")[0] === cookieName);
+    if (fullCookie) {
+        const cookieValue = fullCookie.split("=")[1];
+        return cookieValue
+    }
+    throw new Error(`Could not find cookie with name: ${cookieName}`);
+}
 
 /**
  * Creates a JWT using the environment variable TOKEN_SECRET as the secret key
@@ -24,9 +38,9 @@ function verifyJWT(token) {
         decoded = jwt.verify(token, _tokenSecret);
         return decoded
     } catch (error) {
-        console.log(error);
-        return {}
+        console.log(error.message);
+        throw error
     }
 }
 
-module.exports = { signJWT, verifyJWT }
+module.exports = { findCookieValue, signJWT, verifyJWT }
