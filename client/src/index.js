@@ -1,13 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import PlaylistsContainer from './components/PlaylistsContainer.js';
-import Playlist from './components/Playlist.js'
-import Song from './components/Song';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AudioPlayer from './components/AudioPlayer';
-import App from './components/App';
-
+import { UserContextContainer } from './components/UserContextContainer';
 
 // ========================================
 const song1 = {
@@ -33,7 +27,7 @@ const dummy_playlist = {
   danceability: 0.2,
 }
 ReactDOM.render(
-  <App></App>,
+  <UserContextContainer/>,
   document.getElementById('root')
 );
 
