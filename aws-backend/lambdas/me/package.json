@@ -1,0 +1,18 @@
+{
+  "name": "me",
+  "version": "1.0.0",
+  "description": "Lambda function that returns user profile from Spotify's API",
+  "main": "me.js",
+  "repository": "https://github.com/sampeters747/spotify-sorter",
+  "author": "Sam Peters",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "scripts": {
+    "test": "mocha tests/unit/"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1"
+  }
+}
