@@ -1,5 +1,5 @@
-const axios = require('axios')
-const { signJWT } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layers/dependencies/utils");
+const axios = require('axios');
+const { getSpotifyUserInfo, signJWT } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layers/dependencies/utils");
 
 
 /**
@@ -11,7 +11,7 @@ const { signJWT } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layer
  */
  async function requestUserTokens(code) {
     const endpoint = 'https://accounts.spotify.com/api/token';
-    const redirectUri = 'http://localhost:3000';
+    const redirectUri = process.env.REDIRECT_URI;
     const clientId = process.env.SPOTIFY_CLIENT_ID;
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
     // Configuring request to Spotify token service
@@ -35,6 +35,7 @@ const { signJWT } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layer
     }
 }
 
+
 /**
  * Takes an authorization code, exchanges it for access/refresh tokens from Spotify's
  * API, and creates a signed JWT the user can use on future requests
@@ -45,11 +46,14 @@ async function createAuthJWT(code) {
     try {
         // Requesting access/refresh tokens from Spotify API
         const responseBody = await requestUserTokens(code);
+        // Getting user token
+        const { id } = await getSpotifyUserInfo(responseBody.access_token);
         const payload = {
             accessToken: responseBody.access_token,
             refreshToken: responseBody.refresh_token,
             scope: responseBody.scope,
-            expires_in: responseBody.expires_in,
+            expiresIn: responseBody.expires_in,
+            id: id
         };
         // Signing token
         return signJWT(payload, responseBody.expires_in);
@@ -58,8 +62,8 @@ async function createAuthJWT(code) {
     }
 }
 
-async function login(body) {
-    let code = body.authCode;
+async function login(event) {
+    let code = event.queryStringParameters?.code;
     try {
         if (!code || code==="access_denied") {
             throw new Error("Missing valid authorization code");
@@ -72,19 +76,21 @@ async function login(body) {
 
 exports.lambdaHandler = async (event, context) => {
     try {
-        const authToken = await login(event.body);
+        const authToken = await login(event);
         return {
-            statusCode: 200,
-            body: JSON.stringify({ "jwt": authToken })
+            statusCode: 303,
+            headers: {
+                Location: "http://localhost:3000?status=success"
+            },
+            cookies: [`jwt=${authToken}; Max-Age=3600; HttpOnly; SameSite=None; Secure`]
         }
     } catch (error) {
         return {
-            statusCode: 200,
-            body: JSON.stringify({ 
-                "error": error.message,
-                "stackTrace": error.stack
-            })
+            statusCode: 303,
+            headers: {
+                Location: "http://localhost:3000"
+            },
+
         }
     }
-   
 }
