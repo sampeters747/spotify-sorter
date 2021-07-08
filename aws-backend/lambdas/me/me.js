@@ -1,4 +1,4 @@
-const { getSpotifyUserInfo } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layers/dependencies/utils");
+const { getSpotifyUserInfo } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layers/dependencies/spotify-api-utils");
 
 exports.lambdaHandler = async (event, context) => {
     let response;

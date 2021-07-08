@@ -1,5 +1,6 @@
 const axios = require('axios');
-const { getSpotifyUserInfo, signJWT } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layers/dependencies/utils");
+const { signJWT } = require(process.env.AWS ? "/opt/nodejs/auth-utils" : "../../layers/dependencies/auth-utils");
+const { getSpotifyUserInfo } = require(process.env.AWS ? "/opt/nodejs/spotify-api-utils" : "../../layers/dependencies/spotify-api-utils");
 
 
 /**

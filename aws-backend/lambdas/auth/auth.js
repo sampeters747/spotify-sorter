@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { findCookieValue, verifyJWT } = require(process.env.AWS ? "/opt/nodejs/utils" : "../../layers/dependencies/utils");
+const { findCookieValue, verifyJWT } = require(process.env.AWS ? "/opt/nodejs/auth-utils" : "../../layers/dependencies/auth-utils");
 // const url = 'http://checkip.amazonaws.com/';
 
 
