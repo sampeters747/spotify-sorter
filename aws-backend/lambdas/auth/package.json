@@ -7,7 +7,6 @@
   "author": "Sam Peters",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.1"
   },
   "scripts": {
     "test": "mocha tests/unit/"
