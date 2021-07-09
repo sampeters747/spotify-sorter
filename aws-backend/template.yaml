@@ -27,6 +27,10 @@ Parameters:
   AWSParameter:
     Type: String
     Description: Indicates what environment functions are executing in.
+  RedirectUriParameter:
+    Type: String
+    MinLength: 1
+    Description: Where users are redirected after logging in via Spotify.
 
 
 Resources:
@@ -35,8 +39,19 @@ Resources:
     Properties:
       StageName: "Prod"
       CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - x-apigateway-header
+          - cookie
+          - access-control-allow-origin
+          - content-type
+
         AllowOrigins:
           - "http://localhost:3000"
+          - "http://localhost"
         MaxAge: 20
         AllowCredentials: true
       Auth:
@@ -44,11 +59,11 @@ Resources:
         Authorizers:
           LambdaRequestAuthorizer:
             FunctionArn: !GetAtt AuthFunction.Arn
-            FunctionInvokeRole: !GetAtt AuthFunctionRole.Arn
-            Identity:
-              Headers:
-                - Cookie
-              ReauthorizeEvery: 0
+            FunctionInvokeRole: arn:aws:iam::121961717171:role/lambda_invoke_function_assume_apigw_role
+            # Identity:
+            #   Headers:
+            #     - Cookie
+            # ReauthorizeEvery: 0
             AuthorizerPayloadFormatVersion: 2.0
             EnableSimpleResponses: true
 
@@ -66,15 +81,77 @@ Resources:
           SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
           TOKEN_SECRET: !Ref JWTSecretParameter
           AWS: !Ref AWSParameter
+          REDIRECT_URI: !Ref RedirectUriParameter
       Events:
         LoginEvent:
           Type: HttpApi 
           Properties:
             ApiId: !Ref MyHttpApi
             Path: /login
-            Method: post
+            Method: get
             Auth:
               Authorizer: NONE
+
+  MeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: 
+      CodeUri: lambdas/me
+      Handler: me.lambdaHandler
+      Layers:
+        - !Ref Dependencies
+      Environment:
+        Variables:
+          SPOTIFY_CLIENT_ID: !Ref SpotifyIdParameter
+          SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
+          TOKEN_SECRET: !Ref JWTSecretParameter
+          AWS: !Ref AWSParameter
+      Events:
+        MeEvent:
+          Type: HttpApi 
+          Properties:
+            ApiId: !Ref MyHttpApi
+            Path: /me
+            Method: get
+
+  ImportSongsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: 
+      CodeUri: lambdas/import-songs
+      Handler: import-songs.lambdaHandler
+      Layers:
+        - !Ref Dependencies
+      Environment:
+        Variables:
+          SPOTIFY_CLIENT_ID: !Ref SpotifyIdParameter
+          SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
+          TOKEN_SECRET: !Ref JWTSecretParameter
+          AWS: !Ref AWSParameter
+      Events:
+        ImportSongsRequest:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyHttpApi
+            Path: /importsongs
+            Method: get
+
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: 
+      CodeUri: lambdas/test
+      Handler: test.lambdaHandler
+      Layers:
+        - !Ref Dependencies
+      Events:
+        TestEvent:
+          Type: HttpApi 
+          Properties:
+            ApiId: !Ref MyHttpApi
+            Path: /test
+            Method: get
+
 
   AuthFunction:
     Type: AWS::Serverless::Function
@@ -83,13 +160,10 @@ Resources:
       Handler: auth.lambdaHandler
       Layers:
         - !Ref Dependencies
-      Events:
-        AuthEvent:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref MyHttpApi
-            Path: /auth
-            Method: get
+      Environment:
+        Variables:
+          TOKEN_SECRET: !Ref JWTSecretParameter
+          AWS: !Ref AWSParameter
 
   Dependencies:
     Type: AWS::Serverless::LayerVersion
@@ -102,6 +176,22 @@ Resources:
       RetentionPolicy: Delete
     Metadata:
         BuildMethod: nodejs14.x
+
+  # DynamoDBTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     TableName: "PlaylistApplicationTable"
+  #     BillingMode: "PAY_PER_REQUEST"
+  #     AttributeDefinitions:
+  #       - AttributeName: primaryId
+  #         AtributeType: S
+  #       - AttributeName: secondaryId
+  #         AtributeType: S
+  #     KeySchema:
+  #       - AttributeName: "primaryId"
+  #         KeyType: "HASH"
+  #       - AttributeName: "secondaryId"
+  #         KeyType: "RANGE"
 
 Outputs:
   LoginApi:
