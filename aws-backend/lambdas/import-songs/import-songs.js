@@ -1,6 +1,7 @@
-const { getUserTracks } = require(process.env.AWS ? "/opt/nodejs/spotify-api-utils" : "../../layers/dependencies/spotify-api-utils");
+const { getUserTracks, createOffsetsArray } = require(process.env.AWS ? "/opt/nodejs/spotify-api-utils" : "../../layers/dependencies/spotify-api-utils");
 const AWS = require('aws-sdk');
-const { BatchWrite } = require ('@aws/dynamodb-batch-iterator');
+var AWSXRay = require('aws-xray-sdk');
+// const { BatchWrite } = require ('@aws/dynamodb-batch-iterator');
 
 // Setting region
 const REGION = process.env.AWS_REGION;
@@ -9,7 +10,7 @@ AWS.config.update({ region: REGION });
 // Tablename
 const TABLENAME = "PlaylistApplicationTable";
 // Create the DynamoDB service object
-var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
+var ddb = AWSXRay.captureAWSClient(new AWS.DynamoDB());
 
 const createUserSongPutRequest = (song, userId) => {
     const item = {
@@ -26,43 +27,45 @@ const createUserSongPutRequest = (song, userId) => {
     }
 }
 
-// function saveSongs(songs, userId) {
-//     const putRequests = songs.map(song => createUserSongPutRequest(song, userId));
-//     const offsets = createOffsetsArray(songs.length, 25);
-//     const chunks = offsets.map(offset => putRequests.slice(offset, offset + 25));
-//     const batchedRequests = chunks.map(chunk => {
-//         const batchRequest = {
-//             RequestItems: {
-//                 TABLENAME: chunk
-//             }
-//         }
-//         return batchRequest
-//     });
-//     batchedRequests.map(batch => {
-//         ddb.batchWriteItem
-//     })
-// }
+async function saveBatch(batch, n) {
+    const res = await ddb.batchWriteItem(batch).promise();
+    return res
+}
+
 async function saveSongs(songs, userId) {
     const putRequests = songs.map(song => createUserSongPutRequest(song, userId));
-
-    const keys = putRequests.map(req => [TABLENAME, req]);
-    let count = 0
-    for await (const item of new BatchWrite(ddb, keys)) {
-        count += 1;
-    }
-    console.log(`Finished, wrote ${count} user songs to DynamoDB`);
-    return true
+    const offsets = createOffsetsArray(songs.length, 25);
+    const chunks = offsets.map(offset => putRequests.slice(offset, offset + 25));
+    const batchedRequests = chunks.map(chunk => {
+        const batchRequest = {
+            RequestItems: {
+                [TABLENAME]: chunk
+            }
+        }
+        return batchRequest
+    });
+    console.time("dynamodb");
+    const promises = batchedRequests.map((batch,i) => saveBatch(batch, i));
+    const finished = await Promise.all(promises);
+    console.timeEnd("dynamodb");
+    return finished
 }
+// async function saveSongs(songs, userId) {
+//     const putRequests = songs.map(song => createUserSongPutRequest(song, userId));
+
+//     const keys = putRequests.map(req => [TABLENAME, req]);
+//     let count = 0
+//     for await (const item of new BatchWrite(ddb, keys)) {
+//         count += 1;
+//     }
+//     console.log(`Finished, wrote ${count} user songs to DynamoDB`);
+//     return true
+// }
 
 async function importSongs(accessToken, userId) {
     try {
         const songs = await getUserTracks(accessToken);
-        const status = await saveSongs(songs, userId).catch(e =>{
-            console.log(e.message);
-            console.log(e.stack);
-            throw e
-        } );
-        console.log(status);
+        const status = await saveSongs(songs, userId);
         return songs
     } catch (error) {
         throw error
