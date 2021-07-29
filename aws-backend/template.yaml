@@ -4,8 +4,8 @@ Description: HTTP API
   
 Globals:
   Function:
-    Timeout: 5
-    MemorySize: 128
+    Timeout: 10
+    MemorySize: 256
     Runtime: nodejs14.x
 
 Parameters:
@@ -60,10 +60,6 @@ Resources:
           LambdaRequestAuthorizer:
             FunctionArn: !GetAtt AuthFunction.Arn
             FunctionInvokeRole: arn:aws:iam::121961717171:role/lambda_invoke_function_assume_apigw_role
-            # Identity:
-            #   Headers:
-            #     - Cookie
-            # ReauthorizeEvery: 0
             AuthorizerPayloadFormatVersion: 2.0
             EnableSimpleResponses: true
 
@@ -75,8 +71,12 @@ Resources:
       Handler: login.lambdaHandler
       Layers:
         - !Ref Dependencies
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt LibraryManagerSNSTopic.TopicName
       Environment:
         Variables:
+          SNS_TOPIC_ARN: !Ref LibraryManagerSNSTopic
           SPOTIFY_CLIENT_ID: !Ref SpotifyIdParameter
           SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
           TOKEN_SECRET: !Ref JWTSecretParameter
@@ -117,23 +117,70 @@ Resources:
   ImportSongsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Description: 
+      Description: Fetches a user's songs from Spotify and saves it to a DynamoDB table.
       CodeUri: lambdas/import-songs
       Handler: import-songs.lambdaHandler
       Layers:
         - !Ref Dependencies
       Environment:
         Variables:
+          AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
           SPOTIFY_CLIENT_ID: !Ref SpotifyIdParameter
           SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
           TOKEN_SECRET: !Ref JWTSecretParameter
           AWS: !Ref AWSParameter
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+        - SNSCrudPolicy:
+            TopicName: !GetAtt LibraryManagerSNSTopic.TopicName
       Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref LibraryManagerSNSTopic
+            FilterPolicy:
+              operation:
+                - import_songs
         ImportSongsRequest:
           Type: HttpApi
           Properties:
             ApiId: !Ref MyHttpApi
             Path: /importsongs
+            Method: get
+
+  ImportSongsFunctionInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref ImportSongsFunction
+      Principal: sns.amazonaws.com
+
+  UserSongsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Tracing: Active
+      Description: Retrieves user's saved songs from DynamoDB table and passes them to the client.
+      CodeUri: lambdas/user-songs
+      Handler: user-songs.lambdaHandler
+      Layers:
+        - !Ref Dependencies
+      Environment:
+        Variables:
+          AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+          SPOTIFY_CLIENT_ID: !Ref SpotifyIdParameter
+          SPOTIFY_CLIENT_SECRET: !Ref SpotifySecretParameter
+          TOKEN_SECRET: !Ref JWTSecretParameter
+          AWS: !Ref AWSParameter
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+      Events:
+        UserSongsRequest:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyHttpApi
+            Path: /usersongs
             Method: get
 
   TestFunction:
@@ -151,7 +198,6 @@ Resources:
             ApiId: !Ref MyHttpApi
             Path: /test
             Method: get
-
 
   AuthFunction:
     Type: AWS::Serverless::Function
@@ -177,21 +223,27 @@ Resources:
     Metadata:
         BuildMethod: nodejs14.x
 
-  # DynamoDBTable:
-  #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     TableName: "PlaylistApplicationTable"
-  #     BillingMode: "PAY_PER_REQUEST"
-  #     AttributeDefinitions:
-  #       - AttributeName: primaryId
-  #         AtributeType: S
-  #       - AttributeName: secondaryId
-  #         AtributeType: S
-  #     KeySchema:
-  #       - AttributeName: "primaryId"
-  #         KeyType: "HASH"
-  #       - AttributeName: "secondaryId"
-  #         KeyType: "RANGE"
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "PlaylistApplicationTable"
+      BillingMode: "PAY_PER_REQUEST"
+      AttributeDefinitions:
+        - AttributeName: primaryId
+          AttributeType: S
+        - AttributeName: secondaryId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: "primaryId"
+          KeyType: "HASH"
+        - AttributeName: "secondaryId"
+          KeyType: "RANGE"
+  
+  LibraryManagerSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: LibrarySNS
+      TopicName: LibrarySNS
 
 Outputs:
   LoginApi:
