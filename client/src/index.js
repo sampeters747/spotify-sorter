@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { App } from './components/App';
 import './index.css';
-import { UserContextContainer } from './components/UserContextContainer';
+
 
 // ========================================
 const song1 = {
@@ -27,7 +28,7 @@ const dummy_playlist = {
   danceability: 0.2,
 }
 ReactDOM.render(
-  <UserContextContainer/>,
+  <App/>,
   document.getElementById('root')
 );
 
