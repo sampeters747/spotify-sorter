@@ -24,7 +24,6 @@ async function addTrackFeatures(tracks, spotifyApi) {
             };
             return trackWithAudioFeatures;
         });
-        console.log({updatedUserTracks})
         return updatedUserTracks
     } catch (error) {
         console.log(error);
@@ -103,7 +102,6 @@ async function importSongsBatch(userId, offset, spotifyApi) {
         let saves = ddbBatches.map( batch => saveSongBatch(batch, userId));
         const finished = await Promise.all(saves)
         console.log("finished saving", offset);
-        console.log(finished);
         return finished;
     } catch (e) {
         console.log(e);
