@@ -1,12 +1,13 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { AppBar, Toolbar, Typography, Divider } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Grid } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import UserCard from './UserCard';
-import { red } from '@material-ui/core/colors';
+
 
 const useStyles = makeStyles({
     title: {
-        flexGrow: 3,
+        flexGrow: 1,
+        display: "inline-block"
     },
     blueAvatar: {
         display: 'inline-flex'

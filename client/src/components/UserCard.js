@@ -43,10 +43,12 @@ export default function UserCard(props) {
         loginLogoutButton = <LoginButton/>;
     }
         return (
+            <div>
                 <Grid container direction="row" justify="flex-end" alignItems="center" spacing={1}>
                     <Grid item spacing={1}>{userAvatar}</Grid>
                     <Grid item>{userText}</Grid>
                     <Grid item>{loginLogoutButton}</Grid>
                 </Grid>
+            </div>
         )
 }
