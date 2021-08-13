@@ -1,8 +1,8 @@
 import React from "react";
 import TopAppBar from "./TopAppBar";
 import SongData from "./songdata.json"
-import Playlist from "./Playlist";
-import PlaylistsContainer from "./PlaylistsContainer";
+import SongGridContainer from "./SongGridContainer";
+import { Box } from "@material-ui/core";
 
 
 export default class Main extends React.Component {
@@ -10,7 +10,9 @@ export default class Main extends React.Component {
         return (
             <div>
                 <TopAppBar></TopAppBar>
-                <PlaylistsContainer playlists={[SongData]}></PlaylistsContainer>
+                <Box height="90vh" width="100vw" > <SongGridContainer>
+                    </SongGridContainer>
+                </Box>
             </div>
         )
     }
