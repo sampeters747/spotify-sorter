@@ -6,7 +6,7 @@
   "author": "Sam Peters",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "jsonwebtoken": "^8.5.1",
     "spotify-web-api-node": "^5.0.2"
   }
